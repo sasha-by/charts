@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.imagewordpress.name}}
+  labels:
+    app: {{.Values.app.name}}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{.Values.app.name}}
+      tier: {{.Values.imagewordpress.tier}}
+  strategy:
+   type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{.Values.app.name}}
+        tier: {{.Values.imagewordpress.tier}}
+    spec:
+      containers:
+      - image: "{{.Values.imagewordpress.repository}}:{{.Values.imagewordpress.tag}}"
+        name: {{.Values.imagewordpress.imagename}}
+        env:
+        - name: WORDPRESS_DB_HOST
+          value: {{.Values.imagemysql.name}}
+        - name: WORDPRESS_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass
+              key: password
+        ports:
+        - containerPort: 80
+          name: {{.Values.imagewordpress.name}}
+        volumeMounts:
+        - name: wordpress-persistent-storage
+          mountPath: "/var/www/html"
+      volumes:
+      - name: wordpress-persistent-storage
+        persistentVolumeClaim:
+          claimName: wordpress-pv-claim
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.imagemysql.name}}
+  labels:
+    app: {{.Values.app.name}}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{.Values.app.name}}
+      tier: {{.Values.imagemysql.tier}}
+  strategy:
+   type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{.Values.app.name}}
+        tier: {{.Values.imagemysql.tier}}
+    spec:
+      containers:
+      - image: "{{ .Values.imagemysql.repository }}:{{ .Values.imagemysql.tag | default .Chart.AppVersion }}"
+        name: {{.Values.imagemysql.imagename}}
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass
+              key: password
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: "/var/lib/mysql"
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim
+---

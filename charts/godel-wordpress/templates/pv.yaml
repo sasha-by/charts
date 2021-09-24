@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{.Values.pv.name}}
+  labels:
+    app: {{.Values.app.name}}
+    tier: {{.Values.imagewordpress.tier}}
+spec:
+  capacity:
+    storage: {{.Values.pv.capacity}}
+  accessModes:
+    - ReadWriteMany
+  storageClassName: standard
+  hostPath:
+    path: "/data/html"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-persistent-storage
+  labels:
+    app: {{.Values.app.name}}
+    tier: {{.Values.imagemysql.tier}}
+spec:
+  capacity:
+    storage: {{.Values.pv.capacity}}
+  accessModes:
+    - ReadWriteMany
+  storageClassName: standard
+  hostPath:
+    path: "/data/mysql"
