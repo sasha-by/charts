@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  godel-wordpress:
+  - apiVersion: v2
+    appVersion: "5.6"
+    created: "2021-09-24T12:38:30.733817836Z"
+    description: A Helm chart for Kubernetes
+    digest: ce48ac00a7ff1c99c1e5f1c398f762d291472e918c84ee0494a7580ac9c0ae16
+    name: godel-wordpress
+    type: application
+    urls:
+    - https://github.com/sasha-by/charts/releases/download/godel-wordpress-0.1.1/godel-wordpress-0.1.1.tgz
+    version: 0.1.1
+generated: "2021-09-24T12:38:30.407057636Z"
